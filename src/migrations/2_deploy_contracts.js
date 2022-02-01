@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
-const Marketplace = artifacts.require("Marketplace");
+const SocialMedia = artifacts.require("SocialMedia");
 
 module.exports = function (deployer) {
-    deployer.deploy(Marketplace);
+    deployer.deploy(SocialMedia);
 };
