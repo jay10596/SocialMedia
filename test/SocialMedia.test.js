@@ -38,12 +38,16 @@ contract(SocialMedia, ([deployer, author, reader]) => {
         })
 
         it('has a default post', async () => {
-            // collectionCount = await marketplace.collectionCount()
-            // collection = await marketplace.collections(collectionCount)
+            postCount = await socialMedia.postCount()
+            post = await socialMedia.posts(postCount) // Last post
 
-            // // SUCCESS: Collection created successfully
-            // assert.equal(collectionCount, 1, 'collection exists')
-            // assert.equal(collection.mediaHash, '', 'collection has no mediaHash')
+            // SUCCESS: Collection created successfully
+            assert.equal(postCount, 1, 'post exists')
+            assert.equal(post.id.toNumber(), postCount.toNumber(), 'id is correct')
+            assert.equal(post.content, 'This is a Default Post', 'content is correct')
+            assert.equal(post.mediaHash, '', 'mediaHash is empty')
+            assert.equal(post.tip, '1000000000000000000', 'tip is correct')
+            assert.equal(post.author, deployer, 'author is correct')
         })
     })
 
@@ -51,14 +55,14 @@ contract(SocialMedia, ([deployer, author, reader]) => {
         let result
 
         it('creates post', async () => {
-            // Create a product
+            // Create a post
             result = await socialMedia.createPost('This is my new post', 'QmfMcrTEwmHVZ32Za91corCmtofVJ1dri722oUT3bhaQsX', web3.utils.toWei('1', 'Ether'), { from: author })
             postCount = await socialMedia.postCount()
 
             const event = result.logs[0].args
 
             // SUCCESS: Post created successfully
-            assert.equal(postCount, 1)            
+            assert.equal(postCount, 2)            
             assert.equal(event.id.toNumber(), postCount.toNumber(), 'id is correct')
             assert.equal(event.content, 'This is my new post', 'content is correct')
             assert.equal(event.mediaHash, 'QmfMcrTEwmHVZ32Za91corCmtofVJ1dri722oUT3bhaQsX', 'mediaHash is correct')
@@ -71,7 +75,6 @@ contract(SocialMedia, ([deployer, author, reader]) => {
              * These tests will fail because in the contract, we've require() for these params
              */
             await socialMedia.createPost('', 'QmfMcrTEwmHVZ32Za91corCmtofVJ1dri722oUT3bhaQsX', web3.utils.toWei('1', 'Ether'), { from: author }).should.be.rejected 
-            await socialMedia.createPost('This is my new post', '', web3.utils.toWei('1', 'Ether'), { from: author }).should.be.rejected 
             await socialMedia.createPost('This is my new post', 'QmfMcrTEwmHVZ32Za91corCmtofVJ1dri722oUT3bhaQsX', 0, { from: author }).should.be.rejected 
         })
 

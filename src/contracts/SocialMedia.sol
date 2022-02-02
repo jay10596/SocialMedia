@@ -38,12 +38,14 @@ contract SocialMedia {
 
     constructor() {
         name = "An Etherium based Social Media";
+
+        // Create a default post
+        createPost("This is a Default Post", "", 1000000000000000000);
     }
 
     function createPost(string memory _content, string memory _mediaHash, uint _tip) public {
         // Validation
         require(bytes(_content).length > 0);
-        require(bytes(_mediaHash).length > 0);
         require(_tip > 0);
 
         // Update counter
