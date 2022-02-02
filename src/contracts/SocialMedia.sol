@@ -1,128 +1,81 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Marketplace {
+contract SocialMedia {
     // State variables
     string public name;
-    uint public productCount = 0; 
-    uint public collectionCount = 0; 
+    uint public postCount = 0; 
 
     // Equivalent to database
-    struct Product {
+    struct Post {
         uint id;
-        string name;
+        string content;
         string mediaHash;
-        uint price;
-        address owner;
-        bool purchased;
-        uint collection_id;
+        uint tip;
+        address author;
     }
 
     // Similar to declaring PK for adding data
-    mapping(uint => Product) public products;
+    mapping(uint => Post) public posts;
 
-    // Emit event when a product is created
-    event ProductCreated(
+    // Emit event when a post is created
+    event PostCreated(
         uint id,
-        string name,
+        string content,
         string mediaHash,
-        uint price,
-        address owner,
-        bool purchased,
-        uint collection_id
+        uint tip,
+        address author
     );
 
-    // Emit event when a product is purchased
-    event ProductPurchased(
+    // Emit event when a post gets tipped
+    event PostTipped(
         uint id,
-        string name,
+        string content,
         string mediaHash,
-        uint price,
-        address owner,
-        bool purchased,
-        uint collection_id
-    );
-
-    // Equivalent to database
-    struct Collection {
-        uint id;
-        string name;
-        string mediaHash;
-        address owner;
-    }
-
-    // Similar to declaring PK for adding data
-    mapping(uint => Collection) public collections;
-
-    // Emit event when a collection is created
-    event CollectionCreated(
-        uint id,
-        string name,
-        string mediaHash,
-        address owner
+        uint tip,
+        address author
     );
 
     constructor() {
-        name = "Exotique Marketplace";
-
-        // Create a default collection
-        createCollection('Default', ''); 
+        name = "An Etherium based Social Media";
     }
 
-    function createProduct(string memory _name, string memory _mediaHash, uint _price, uint _collection_id) public {
+    function createPost(string memory _content, string memory _mediaHash, uint _tip) public {
         // Validation
-        require(bytes(_name).length > 0);
+        require(bytes(_content).length > 0);
         require(bytes(_mediaHash).length > 0);
-        require(_price > 0);
+        require(_tip > 0);
 
         // Update counter
-        productCount ++;
+        postCount ++;
 
-        // Create a product
-        products[productCount] = Product(productCount, _name, _mediaHash, _price, msg.sender, false, _collection_id);
+        // Create a post
+        posts[postCount] = Post(postCount, _content, _mediaHash, _tip, msg.sender);
 
         // Trigger an event (Similar to return)
-        emit ProductCreated(productCount, _name, _mediaHash, _price, msg.sender, false, _collection_id);
+        emit PostCreated(postCount, _content, _mediaHash, _tip, msg.sender);
     }
 
-    function purchaseProduct(uint _id) public payable {
-        // Fetch product and owner
-        Product memory _product = products[_id];
-        address _owner = _product.owner;
+    function tipPost(uint _id) public payable {
+        // Fetch post and author
+        Post memory _post = posts[_id];
 
         // Validation
-        require(_product.id > 0 && _product.id <= productCount); // Id is valid
-        require(msg.value >= _product.price); // There is enough ETH in transation
-        require(!_product.purchased); // Product is not purchased already
-        require(msg.sender != _owner); // Buyer is not the owner
+        require(_post.id > 0 && _post.id <= postCount); // Id is valid
+        require(msg.value > 0); // There is enough ETH in transation
+        require(msg.sender != _post.author); // Reader is not the author
 
-        // Transfer ownership and update price
-        _product.owner = msg.sender;
-        _product.purchased = true;
-        _product.price = msg.value;
+        // Add new tip to the post
+        _post.tip = _post.tip + msg.value;
 
         // Update the actual product in blockchain
-        products[_id] = _product;
+        posts[_id] = _post;
 
-        // Pay the owner
-        payable(_owner).transfer(msg.value);
+        // Pay the author
+        payable(_post.author).transfer(msg.value);
 
         // Trigger an event
-        emit ProductPurchased(_id, _product.name, _product.mediaHash, _product.price, msg.sender, true, _product.collection_id);
-    }
-
-    function createCollection(string memory _name, string memory _mediaHash) public {
-        // Validation
-        require(bytes(_name).length > 0);
-
-        // Update counter
-        collectionCount ++;
-
-        // Create a collection
-        collections[collectionCount] = Collection(collectionCount, _name, _mediaHash, msg.sender);
-
-        // Trigger an event (Similar to return)
-        emit CollectionCreated(collectionCount, _name, _mediaHash, msg.sender);
+        emit PostTipped(postCount, _post.content, _post.mediaHash, _post.tip, _post.author);
     }
 }
 
