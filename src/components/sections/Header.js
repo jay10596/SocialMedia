@@ -9,8 +9,7 @@ const Header = (props) => {
     return (
         <header>
             {props.account}
-            <Link to="/collections">collections</Link>
-            <Link to="/products">Products</Link>
+            <Link to="/posts">Posts</Link>
             <Link to="/about">About</Link>
 
             <button onClick={() => dispatch(setTheme({color: props.themeColor === 'light' ? 'dark' : 'light'}))}>
