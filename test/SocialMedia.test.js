@@ -19,7 +19,7 @@ contract(SocialMedia, ([deployer, author, reader]) => {
         it('deploys successfully', async () => {
             const address = await socialMedia.address
 
-            // SUCCESS: Marketplace deployed successfully
+            // SUCCESS: SocialMedia deployed successfully
             assert.notEqual(address, 0x0)
             assert.notEqual(address, '')
             assert.notEqual(address, null)
@@ -29,7 +29,7 @@ contract(SocialMedia, ([deployer, author, reader]) => {
         it('has a name', async () => {
             const name = await socialMedia.name()
 
-            // SUCCESS: Marketplace has correct name
+            // SUCCESS: SocialMedia has correct name
             assert.equal(name, 'An Etherium based Social Media')
             assert.notEqual(name, 0x0)
             assert.notEqual(name, '')
@@ -41,12 +41,12 @@ contract(SocialMedia, ([deployer, author, reader]) => {
             postCount = await socialMedia.postCount()
             post = await socialMedia.posts(postCount) // Last post
 
-            // SUCCESS: Collection created successfully
+            // SUCCESS: post created successfully
             assert.equal(postCount, 1, 'post exists')
             assert.equal(post.id.toNumber(), postCount.toNumber(), 'id is correct')
             assert.equal(post.content, 'This is a Default Post', 'content is correct')
             assert.equal(post.mediaHash, '', 'mediaHash is empty')
-            assert.equal(post.tip, '1000000000000000000', 'tip is correct')
+            assert.equal(post.tip, '0', 'tip is correct')
             assert.equal(post.author, deployer, 'author is correct')
         })
     })
@@ -56,7 +56,7 @@ contract(SocialMedia, ([deployer, author, reader]) => {
 
         it('creates post', async () => {
             // Create a post
-            result = await socialMedia.createPost('This is my new post', 'QmfMcrTEwmHVZ32Za91corCmtofVJ1dri722oUT3bhaQsX', web3.utils.toWei('1', 'Ether'), { from: author })
+            result = await socialMedia.createPost('This is my new post', 'QmfMcrTEwmHVZ32Za91corCmtofVJ1dri722oUT3bhaQsX', 0, { from: author })
             postCount = await socialMedia.postCount()
 
             const event = result.logs[0].args
@@ -66,16 +66,15 @@ contract(SocialMedia, ([deployer, author, reader]) => {
             assert.equal(event.id.toNumber(), postCount.toNumber(), 'id is correct')
             assert.equal(event.content, 'This is my new post', 'content is correct')
             assert.equal(event.mediaHash, 'QmfMcrTEwmHVZ32Za91corCmtofVJ1dri722oUT3bhaQsX', 'mediaHash is correct')
-            assert.equal(event.tip, '1000000000000000000', 'tip is correct')
+            assert.equal(event.tip, '0', 'total tip amount is correct')
             assert.equal(event.author, author, 'author is correct')
 
             // FAILURE: Post couldn't be created with missing params 
             /*
-             * Metadata is called msg
              * These tests will fail because in the contract, we've require() for these params
              */
-            await socialMedia.createPost('', 'QmfMcrTEwmHVZ32Za91corCmtofVJ1dri722oUT3bhaQsX', web3.utils.toWei('1', 'Ether'), { from: author }).should.be.rejected 
-            await socialMedia.createPost('This is my new post', 'QmfMcrTEwmHVZ32Za91corCmtofVJ1dri722oUT3bhaQsX', 0, { from: author }).should.be.rejected 
+            await socialMedia.createPost('', 'QmfMcrTEwmHVZ32Za91corCmtofVJ1dri722oUT3bhaQsX', 0, { from: author }).should.be.rejected 
+            await socialMedia.createPost('This is my new post', 'QmfMcrTEwmHVZ32Za91corCmtofVJ1dri722oUT3bhaQsX', web3.utils.toWei('1', 'Ether'), { from: author }).should.be.rejected 
         })
 
         it('displays post', async () => {
@@ -86,7 +85,7 @@ contract(SocialMedia, ([deployer, author, reader]) => {
             assert.equal(post.id.toNumber(), postCount.toNumber(), 'id is correct')
             assert.equal(post.content, 'This is my new post', 'content is correct')
             assert.equal(post.mediaHash, 'QmfMcrTEwmHVZ32Za91corCmtofVJ1dri722oUT3bhaQsX', 'mediaHash is correct')
-            assert.equal(post.tip, '1000000000000000000', 'tip is correct')
+            assert.equal(post.tip, '0', 'total tip amount is correct')
             assert.equal(post.author, author, 'author is correct')
         })
 
@@ -105,7 +104,7 @@ contract(SocialMedia, ([deployer, author, reader]) => {
             assert.equal(event.id.toNumber(), postCount.toNumber(), 'id is correct')
             assert.equal(event.content, 'This is my new post', 'content is correct')
             assert.equal(event.mediaHash, 'QmfMcrTEwmHVZ32Za91corCmtofVJ1dri722oUT3bhaQsX', 'mediaHash is correct')
-            assert.equal(event.tip, '3000000000000000000', 'total tip amount is correct')
+            assert.equal(event.tip, '2000000000000000000', 'total tip amount is correct')
             assert.equal(event.author, author, 'author is correct')
 
             // Auther's balance after getting tipped

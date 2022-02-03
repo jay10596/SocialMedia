@@ -1,8 +1,8 @@
 import React, { useEffect }  from 'react';
 import Web3 from 'web3';
-import Marketplace from '../build/Marketplace.json';
+import SocialMedia from '../build/SocialMedia.json';
 import { useDispatch, useSelector } from 'react-redux';
-import { setMarketplace } from '../helpers/reducers/Marketplace'
+import { setSocialMedia } from '../helpers/reducers/SocialMedia'
 import Router from '../helpers/router';
 
 import Header from './sections/Header';
@@ -13,7 +13,7 @@ import Footer from './sections/Footer';
 function App() {    
     const dispatch = useDispatch()
     const theme = useSelector((state) => state.theme)
-    const marketplace = useSelector((state) => state.marketplace.value)
+    const socialMedia = useSelector((state) => state.socialMedia.value)
 
     // Equivalent to componentWillMount()
     useEffect(() => {
@@ -42,32 +42,22 @@ function App() {
         const netId = await window.web3.eth.net.getId()
 
         // Check if smart contract is deployed to correct network(Ganache) 
-        if(Marketplace.networks[netId]) {
-            const marketplace = new window.web3.eth.Contract(Marketplace.abi, Marketplace.networks[netId].address)
+        if(SocialMedia.networks[netId]) {
+            const socialMedia = new window.web3.eth.Contract(SocialMedia.abi, SocialMedia.networks[netId].address)
 
-            const collectionCount = await marketplace.methods.collectionCount().call() /* https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26 */
-            const collections = []
+            const postCount = await socialMedia.methods.postCount().call() /* https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26 */
+            const posts = []
 
-            for(var j = 1; j <= collectionCount; j++) {
-                const collection = await marketplace.methods.collections(j).call()
-                collections.push(collection)
+            for(var i = 1; i <= postCount; i++) {
+                const post = await socialMedia.methods.posts(i).call()
+                posts.push(post)
             }
 
-            const productCount = await marketplace.methods.productCount().call()
-            const products = []
-
-            for(var i = 1; i <= productCount; i++) {
-                const product = await marketplace.methods.products(i).call()
-                products.push(product)
-            }
-
-            dispatch(setMarketplace({ 
+            dispatch(setSocialMedia({ 
                 account: account[0],
-                marketplace: marketplace,
-                collectionCount: collectionCount,
-                collections: collections,
-                productCount: productCount,
-                products: products,
+                socialMedia: socialMedia,
+                postCount: postCount,
+                posts: posts,
                 loading: false
             }))
         } else {
@@ -77,9 +67,9 @@ function App() {
 
     return (
         <div className="App" >
-            <Header account={marketplace.account} themeColor={theme.color} />
+            <Header account={socialMedia.account} themeColor={theme.color} />
 
-            {marketplace.loading 
+            {socialMedia.loading 
                 ? <Loading />
                 : <Router />                    
             }

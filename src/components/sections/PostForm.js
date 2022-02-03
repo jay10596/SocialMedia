@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { createCollection } from '../../helpers/reducers/Marketplace'
-import { create } from 'ipfs-http-client'
+import { createPost } from '../../helpers/reducers/SocialMedia';
+import { create } from 'ipfs-http-client';
 
 import SectionHeader from '../reusables/SectionHeader';
 
-function CollectionForm() {
+function PostForm() {
     const dispatch = useDispatch()
 
-    const [name, setName] = useState('')
-    const [media, setMedia] = useState()
+    const [content, setContent] = useState('')
+    const [media, setMedia] = useState(null)
 
     // Binding values
-    const updateName = (e) => setName(e.target.value)
+    const updateContent = (e) => setContent(e.target.value)
     const updateMedia = (e) => setMedia(e.target.files[0])
 
     // Submit form
@@ -22,18 +22,19 @@ function CollectionForm() {
         // Upload media on IPFS and get Hash
         const client = create({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
         const uploadedMedia = media == null ? null : await client.add(media)
-        
-        dispatch(createCollection({name: name, media: uploadedMedia ? uploadedMedia.path : ''}))
+
+        // Default tip amount is 0 when you create a post
+        dispatch(createPost({content: content, mediaHash: uploadedMedia ? uploadedMedia.path : '', tip: 0}))
     }
 
     return (
         <section>
-            <SectionHeader heading="Create a collection" />
+            <SectionHeader heading="Create a post" />
 
             <form onSubmit={handleSubmit}>
                 <label>
-                    Name:
-                    <input type="text" name="name" value={name} onChange={updateName} />
+                    content:
+                    <input type="textarea" name="name" value={content} onChange={updateContent} />
                 </label>
 
                 <label>
@@ -47,4 +48,4 @@ function CollectionForm() {
     );
 }
 
-export default CollectionForm;
+export default PostForm;

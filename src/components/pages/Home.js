@@ -1,23 +1,17 @@
 import React from 'react';
 
 import Banner from '../sections/Banner';
-import CollectionForm from '../sections/CollectionForm';
-import CollectionList from '../sections/CollectionList';
-import ProductForm from '../sections/ProductForm';
-import ProductList from '../sections/ProductList';
+import PostForm from '../sections/PostForm';
+import PostList from '../sections/PostList';
 
 function Home() {
     return (
         <main>
             <Banner />
 
-            <CollectionForm />
+            <PostForm />
 
-            <CollectionList />
-
-            <ProductForm />
-
-            <ProductList />
+            <PostList />
         </main>
     );
 }

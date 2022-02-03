@@ -40,13 +40,13 @@ contract SocialMedia {
         name = "An Etherium based Social Media";
 
         // Create a default post
-        createPost("This is a Default Post", "", 1000000000000000000);
+        createPost("This is a Default Post", "", 0);
     }
 
     function createPost(string memory _content, string memory _mediaHash, uint _tip) public {
         // Validation
         require(bytes(_content).length > 0);
-        require(_tip > 0);
+        require(_tip == 0); // Initial tip amount will be 0 when you create a post
 
         // Update counter
         postCount ++;
